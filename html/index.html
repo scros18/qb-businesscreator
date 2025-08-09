@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Website Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow: hidden;
+        }
+
+        .website-builder {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            height: 90vh;
+            background: rgba(20, 20, 30, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translate(-50%, -50%) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .builder-header {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .builder-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .builder-content {
+            display: grid;
+            grid-template-columns: 250px 1fr 350px;
+            height: calc(100% - 80px);
+        }
+
+        /* Template Selector */
+        .template-selector {
+            background: rgba(30, 30, 40, 0.8);
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .template-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .template-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .template-card.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .template-card h3 {
+            color: #fff;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .template-card p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+
+        .template-price {
+            color: #4ade80;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        /* Preview Area */
+        .preview-area {
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-toolbar {
+            background: rgba(30, 30, 40, 0.9);
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .device-selector {
+            display: flex;
+            gap: 5px;
+        }
+
+        .device-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .device-btn.active {
+            background: #667eea;
+        }
+
+        .preview-iframe {
+            width: 100%;
+            height: calc(100% - 50px);
+            border: none;
+            background: white;
+        }
+
+        .preview-iframe.mobile {
+            width: 375px;
+            height: 667px;
+            margin: 20px auto;
+            border: 10px solid #333;
+            border-radius: 20px;
+        }
+
+        .preview-iframe.tablet {
+            width: 768px;
+            height: 1024px;
+            margin: 20px auto;
+            border: 15px solid #333;
+            border-radius: 15px;
+        }
+
+        /* Customization Panel */
+        .customization-panel {
+            background: rgba(30, 30, 40, 0.8);
+            padding: 20px;
+            overflow-y: auto;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .customization-section {
+            margin-bottom: 30px;
+        }
+
+        .customization-section h3 {
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .color-picker {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .image-upload {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .image-upload:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .product-manager {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .product-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-item button {
+            background: #ef4444;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-product-btn {
+            width: 100%;
+            background: #4ade80;
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .add-product-btn:hover {
+            background: #22c55e;
+            transform: scale(1.02);
+        }
+
+        .action-buttons {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .save-btn, .publish-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .save-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .publish-btn {
+            background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
+            color: white;
+        }
+
+        .save-btn:hover, .publish-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* SEO Settings */
+        .seo-preview {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .seo-title {
+            color: #1a0dab;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .seo-url {
+            color: #006621;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .seo-description {
+            color: #545454;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="website-builder" id="websiteBuilder">
+        <div class="builder-header">
+            <h1>🌐 Business Website Builder</h1>
+            <button class="close-btn" onclick="closeBuilder()">✕ Close</button>
+        </div>
+        
+        <div class="builder-content">
+            <!-- Template Selector -->
+            <div class="template-selector">
+                <h3 style="color: white; margin-bottom: 20px;">Choose Template</h3>
+                <div id="templateList"></div>
+            </div>
+            
+            <!-- Preview Area -->
+            <div class="preview-area">
+                <div class="preview-toolbar">
+                    <div class="device-selector">
+                        <button class="device-btn active" onclick="setDevice('desktop')">💻 Desktop</button>
+                        <button class="device-btn" onclick="setDevice('tablet')">📱 Tablet</button>
+                        <button class="device-btn" onclick="setDevice('mobile')">📱 Mobile</button>
+                    </div>
+                    <span style="color: white; margin-left: auto;">Live Preview</span>
+                </div>
+                <iframe class="preview-iframe" id="previewFrame" src="about:blank"></iframe>
+            </div>
+            
+            <!-- Customization Panel -->
+            <div class="customization-panel">
+                <div class="customization-section">
+                    <h3>🎨 Design</h3>
+                    <div class="form-group">
+                        <label>Primary Color</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="primaryColor" value="#667eea" onchange="updateColor('primary', this.value)">
+                            <input type="text" value="#667eea" id="primaryColorText">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Secondary Color</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="secondaryColor" value="#764ba2" onchange="updateColor('secondary', this.value)">
+                            <input type="text" value="#764ba2" id="secondaryColorText">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Logo</label>
+                        <div class="image-upload" onclick="uploadImage('logo')">
+                            <p>📤 Click to upload logo</p>
+                            <small style="color: rgba(255,255,255,0.5)">PNG, JPG (Max 2MB)</small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Banner Image</label>
+                        <div class="image-upload" onclick="uploadImage('banner')">
+                            <p>🖼️ Click to upload banner</p>
+                            <small style="color: rgba(255,255,255,0.5)">1920x600 recommended</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="customization-section">
+                    <h3>📝 Content</h3>
+                    <div class="form-group">
+                        <label>Business Name</label>
+                        <input type="text" id="businessName" placeholder="Your Business Name" onchange="updateContent('name', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label>Tagline</label>
+                        <input type="text" id="tagline" placeholder="Your catchy tagline" onchange="updateContent('tagline', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label>About Us</label>
+                        <textarea id="aboutUs" rows="4" placeholder="Tell customers about your business..." onchange="updateContent('about', this.value)"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Phone</label>
+                        <input type="text" id="phone" placeholder="555-0100" onchange="updateContent('phone', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email" placeholder="info@business.com" onchange="updateContent('email', this.value)">
+                    </div>
+                </div>
+                
+                <div class="customization-section">
+                    <h3>🛍️ Products/Services</h3>
+                    <div class="product-manager" id="productManager">
+                        <div id="productList"></div>
+                        <button class="add-product-btn" onclick="addProduct()">+ Add Product</button>
+                    </div>
+                </div>
+                
+                <div class="customization-section">
+                    <h3>🔍 SEO Settings</h3>
+                    <div class="form-group">
+                        <label>Page Title</label>
+                        <input type="text" id="seoTitle" placeholder="Business Name | Best Services in Los Santos">
+                    </div>
+                    <div class="form-group">
+                        <label>Meta Description</label>
+                        <textarea id="seoDescription" rows="3" placeholder="Describe your business for search engines..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Keywords</label>
+                        <input type="text" id="seoKeywords" placeholder="restaurant, food, los santos, delivery">
+                    </div>
+                    <div class="seo-preview">
+                        <div class="seo-title" id="seoPreviewTitle">Your Business Name</div>
+                        <div class="seo-url" id="seoPreviewUrl">yourbusiness.losantos.com</div>
+                        <div class="seo-description" id="seoPreviewDesc">Your business description will appear here...</div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="save-btn" onclick="saveWebsite()">💾 Save Draft</button>
+                    <button class="publish-btn" onclick="publishWebsite()">🚀 Go Live!</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+    
+    <script>
+        let currentTemplate = 'modern';
+        let currentBusiness = null;
+        let websiteData = {
+            template: 'modern',
+            customization: {},
+            content: {},
+            products: [],
+            seo: {}
+        };
+        
+        // Listen for NUI messages
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+            
+            if (data.action === 'openWebsiteBuilder') {
+                currentBusiness = data.businessData;
+                loadTemplates(data.templates);
+                if (data.currentWebsite) {
+                    loadExistingWebsite(data.currentWebsite);
+                }
+                document.getElementById('websiteBuilder').style.display = 'block';
+            }
+            
+            if (data.action === 'loadTemplate') {
+                loadTemplatePreview(data.template);
+            }
+            
+            if (data.action === 'updatePreview') {
+                updatePreviewElement(data.element, data.value);
+            }
+        });
+        
+        function loadTemplates(templates) {
+            const container = document.getElementById('templateList');
+            container.innerHTML = '';
+            
+            for (const [key, template] of Object.entries(templates)) {
+                const card = document.createElement('div');
+                card.className = 'template-card';
+                card.onclick = () => selectTemplate(key);
+                card.innerHTML = `
+                    <h3>${template.name}</h3>
+                    <p>${template.customizable.join(', ')}</p>
+                    <div class="template-price">$${template.price}</div>
+                `;
+                container.appendChild(card);
+            }
+        }
+        
+        function selectTemplate(templateId) {
+            currentTemplate = templateId;
+            websiteData.template = templateId;
+            
+            // Update UI
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Load template preview
+            fetch(`/templates/${templateId}.html`)
+                .then(response => response.text())
+                .then(html => {
+                    const previewFrame = document.getElementById('previewFrame');
+                    previewFrame.srcdoc = html;
+                });
+            
+            // Send to game
+            fetch(`https://${GetParentResourceName()}/selectTemplate`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({template: templateId})
+            });
+        }
+        
+        function updateColor(type, value) {
+            websiteData.customization[type + 'Color'] = value;
+            document.getElementById(type + 'ColorText').value = value;
+            
+            // Update preview
+            const previewFrame = document.getElementById('previewFrame');
+            if (previewFrame.contentDocument) {
+                const root = previewFrame.contentDocument.documentElement;
+                root.style.setProperty(`--${type}-color`, value);
+            }
+        }
+        
+        function updateContent(field, value) {
+            websiteData.content[field] = value;
+            
+            // Update preview in real-time
+            const previewFrame = document.getElementById('previewFrame');
+            if (previewFrame.contentDocument) {
+                const element = previewFrame.contentDocument.getElementById(field);
+                if (element) {
+                    element.textContent = value;
+                }
+            }
+            
+            // Update SEO preview if relevant
+            if (field === 'name') {
+                document.getElementById('seoPreviewTitle').textContent = value;
+                document.getElementById('seoPreviewUrl').textContent = value.toLowerCase().replace(/\s+/g, '-') + '.losantos.com';
+            }
+        }
+        
+        function addProduct() {
+            const product = {
+                id: 'product_' + Date.now(),
+                name: prompt('Product Name:'),
+                price: parseFloat(prompt('Price ($):')),
+                description: prompt('Description:')
+            };
+            
+            if (product.name && product.price) {
+                websiteData.products.push(product);
+                updateProductList();
+                
+                // Send to game
+                fetch(`https://${GetParentResourceName()}/addProduct`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({product: product})
+                });
+            }
+        }
+        
+        function updateProductList() {
+            const container = document.getElementById('productList');
+            container.innerHTML = '';
+            
+            websiteData.products.forEach(product => {
+                const item = document.createElement('div');
+                item.className = 'product-item';
+                item.innerHTML = `
+                    <span>${product.name} - $${product.price}</span>
+                    <button onclick="removeProduct('${product.id}')">Remove</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        function removeProduct(productId) {
+            websiteData.products = websiteData.products.filter(p => p.id !== productId);
+            updateProductList();
+        }
+        
+        function uploadImage(type) {
+            // In a real implementation, this would open a file dialog
+            // For FiveM, we'll simulate with a URL input
+            const url = prompt(`Enter image URL for ${type}:`);
+            if (url) {
+                websiteData.customization[type] = url;
+                
+                // Update preview
+                const previewFrame = document.getElementById('previewFrame');
+                if (previewFrame.contentDocument) {
+                    const element = previewFrame.contentDocument.getElementById(type);
+                    if (element) {
+                        element.src = url;
+                    }
+                }
+            }
+        }
+        
+        function setDevice(device) {
+            document.querySelectorAll('.device-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            const iframe = document.getElementById('previewFrame');
+            iframe.className = 'preview-iframe ' + (device !== 'desktop' ? device : '');
+        }
+        
+        function saveWebsite() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            // Gather SEO data
+            websiteData.seo = {
+                title: document.getElementById('seoTitle').value,
+                description: document.getElementById('seoDescription').value,
+                keywords: document.getElementById('seoKeywords').value
+            };
+            
+            // Send to game
+            fetch(`https://${GetParentResourceName()}/saveWebsite`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    businessId: currentBusiness.id,
+                    ...websiteData
+                })
+            }).then(() => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                showNotification('Website saved successfully!', 'success');
+            });
+        }
+        
+        function publishWebsite() {
+            if (confirm('Ready to make your website live? This will make it accessible to all players!')) {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                
+                fetch(`https://${GetParentResourceName()}/publishWebsite`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        businessId: currentBusiness.id,
+                        ...websiteData,
+                        isLive: true
+                    })
+                }).then(() => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    showNotification('Website is now live!', 'success');
+                });
+            }
